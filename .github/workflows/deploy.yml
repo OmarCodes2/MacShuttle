@@ -28,6 +28,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
+      - name: Set up Go environment
+        run: |
+          echo "GOPATH=$(go env GOPATH)" >> $GITHUB_ENV
+          echo "GO111MODULE=on" >> $GITHUB_ENV
+          echo "PATH=$(go env GOPATH)/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: go mod download
+        working-directory: backend
+
       - name: Build application
         run: go build -o my-app
         working-directory: backend
