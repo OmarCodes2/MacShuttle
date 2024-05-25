@@ -33,12 +33,15 @@ jobs:
         working-directory: backend
 
       - name: Build application
-        run: go build -o my-app
+        run: GOOS=linux GOARCH=amd64 go build -o my-app
+        working-directory: backend
+
+      - name: Set execute permissions
+        run: chmod +x my-app
         working-directory: backend
 
       - name: Install Elastic Beanstalk CLI
-        run: |
-          pip install awsebcli
+        run: pip install awsebcli
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
