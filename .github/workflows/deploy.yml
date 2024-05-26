@@ -32,6 +32,9 @@ jobs:
         run: go mod download
         working-directory: backend
 
+      - name: Create .env file
+        run: echo "POSTGRES_CONNECTION_STRING=${{ secrets.POSTGRES_CONNECTION_STRING }}" > backend/.env
+
       - name: Build application
         run: GOOS=linux GOARCH=amd64 go build -o my-app
         working-directory: backend
