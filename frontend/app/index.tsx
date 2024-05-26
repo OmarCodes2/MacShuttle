@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, StyleSheet, Button, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import * as Location from 'expo-location';
 import axios from 'axios';
 
@@ -76,15 +76,15 @@ export default function Home() {
           </Text>
         )
       )}
-      <Button
-        title={tracking ? 'Stop' : 'Start'}
+      <TouchableOpacity
+        style={[styles.button, styles.startStopButton]}
         onPress={tracking ? stopTracking : startTracking}
-      />
-      {tracking && <ActivityIndicator size="large" color="#0000ff" />}
-      <Button
-        title={`Toggle Direction (Current: ${direction})`}
-        onPress={toggleDirection}
-      />
+      >
+        <Text style={styles.buttonText}>{tracking ? 'Stop' : 'Start'}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={toggleDirection}>
+        <Text style={styles.buttonText}>Toggle Direction (Current: {direction})</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -99,11 +99,26 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 24,
     color: '#000',
-    margin: 10,
+    margin: 20,
   },
   error: {
     fontSize: 18,
     color: 'red',
     margin: 10,
+  },
+  button: {
+    backgroundColor: '#007bff',
+    padding: 15,
+    borderRadius: 25,
+    margin: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  startStopButton: {
+    marginTop: 30,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
