@@ -62,7 +62,7 @@ export default function Home() {
   };
 
   const toggleDirection = () => {
-    setDirection((prevDirection) => (prevDirection === 'forward' ? 'backward' : 'forward'));
+    setDirection((prevDirection) => (prevDirection === 'forward' ? 'reverse' : 'forward'));
   };
 
   return (
