@@ -7,15 +7,9 @@ import (
 )
 
 type LocationData struct {
-	Type       string  `json:"_type"`
-	SSID       string  `json:"SSID"`
-	Altitude   float64 `json:"alt"`
-	Battery    int     `json:"batt"`
-	Connection string  `json:"conn"`
-	Latitude   float64 `json:"lat"`
-	Longitude  float64 `json:"lon"`
-	Timestamp  int64   `json:"tst"`
-	Velocity   float64 `json:"vel"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Timestamp int64   `json:"timestamp"`
 }
 
 func InitializeRouter() *http.ServeMux {
