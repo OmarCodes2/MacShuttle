@@ -39,7 +39,7 @@ export default function Home() {
       const timestamp = Date.now() - initialTime; // Timestamp in milliseconds relative to start
 
       // Replace with your actual endpoint URL
-      const endpointUrl = 'http://macshuttle-env.eba-thck352g.us-east-1.elasticbeanstalk.com/location';
+      const endpointUrl = `${process.env.EXPO_PUBLIC_API_URL}/location`;
       try {
         await axios.post(endpointUrl, {
           latitude,
