@@ -27,7 +27,11 @@ export default function Home() {
     };
   }, []);
 
-  const startTracking = () => {
+  const startTracking = async () => {
+    const retrieveID = `${process.env.EXPO_PUBLIC_API_URL}/retrieveRunID`;
+      await Tracking();
+  }
+  const Tracking = () => {
     setTracking(true);
     const initialTime = Date.now();
     setStartTime(initialTime);
@@ -40,6 +44,9 @@ export default function Home() {
 
       // Replace with your actual endpoint URL
       const endpointUrl = `${process.env.EXPO_PUBLIC_API_URL}/location`;
+      console.log(endpointUrl)
+      console.log("latitude is")
+      console.log(latitude)
       try {
         await axios.post(endpointUrl, {
           latitude,

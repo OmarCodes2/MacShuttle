@@ -8,14 +8,19 @@ import (
 	"log"
 	"net/http"
 
-	_ "github.com/lib/pq"
-	"github.com/OmarCodes2/MacShuttle/models"
 	"github.com/OmarCodes2/MacShuttle/database"
+	"github.com/OmarCodes2/MacShuttle/models"
+	_ "github.com/lib/pq"
+)
+
+var (
+	runID int
 )
 
 func InitializeRouter(db *sql.DB) *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", helloHandler)
+	mux.HandleFunc("/retrieveRunID", GetNewRunID(db))
 	mux.HandleFunc("/location", locationHandler(db))
 	return mux
 }
@@ -23,6 +28,28 @@ func InitializeRouter(db *sql.DB) *http.ServeMux {
 func helloHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Hello, World!"))
+}
+
+func GetNewRunID(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+			return
+		}
+		var latestRunID int
+		err := db.QueryRow(`SELECT COALESCE(MAX(run_id), 0) FROM bus_positions`).Scan(&latestRunID)
+		if err != nil {
+			http.Error(w, "Error retrieving current run_id", http.StatusInternalServerError)
+			return
+		}
+
+		newRunID := latestRunID + 1
+		//Modifying Run ID Variable
+		runID = newRunID
+		log.Println("getting new run id correctly")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Able to successfully updated runID"))
+	}
 }
 
 func locationHandler(db *sql.DB) http.HandlerFunc {
@@ -40,8 +67,9 @@ func locationHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		log.Printf("Received location: %+v\n", locData)
+		log.Printf("RunID is %v", runID)
 
-		if err := database.SaveLocation(db, locData, 1); err != nil {
+		if err := database.SaveLocation(db, locData, runID); err != nil {
 			log.Printf("Error saving location: %v\n", err)
 			http.Error(w, "Error saving location", http.StatusInternalServerError)
 			return
