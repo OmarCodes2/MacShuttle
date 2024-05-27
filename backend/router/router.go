@@ -3,16 +3,15 @@ package router
 import (
 	"database/sql"
 	"encoding/json"
+
+	//"fmt"
 	"log"
 	"net/http"
-)
 
-type LocationData struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	Timestamp int64   `json:"timestamp"`
-	Direction string  `json:"direction"`
-}
+	_ "github.com/lib/pq"
+	"github.com/OmarCodes2/MacShuttle/models"
+	"github.com/OmarCodes2/MacShuttle/database"
+)
 
 func InitializeRouter(db *sql.DB) *http.ServeMux {
 	mux := http.NewServeMux()
@@ -33,7 +32,7 @@ func locationHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		var locData LocationData
+		var locData models.LocationData
 		err := json.NewDecoder(r.Body).Decode(&locData)
 		if err != nil {
 			http.Error(w, "Error decoding JSON", http.StatusBadRequest)
@@ -42,9 +41,9 @@ func locationHandler(db *sql.DB) http.HandlerFunc {
 
 		log.Printf("Received location: %+v\n", locData)
 
-		err = db.Ping()
-		if err != nil {
-			http.Error(w, "Database connection error", http.StatusInternalServerError)
+		if err := database.SaveLocation(db, locData, 1); err != nil {
+			log.Printf("Error saving location: %v\n", err)
+			http.Error(w, "Error saving location", http.StatusInternalServerError)
 			return
 		}
 
@@ -52,3 +51,20 @@ func locationHandler(db *sql.DB) http.HandlerFunc {
 		w.Write([]byte("Location received and database connection is successful"))
 	}
 }
+
+// func startRunHandler(w http.ResponseWriter, r *http.Request) {
+// 	mutex.Lock()
+// 	defer mutex.Unlock()
+
+// 	var currentRunID int
+// 	err := db.QueryRow("SELECT current_run_id FROM run_info LIMIT 1").Scan(&currentRunID)
+// 	if err != nil {
+// 		http.Error(w, "Error retrieving current run_id", http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	newRunID := currentRunID + 1
+
+// 	w.WriteHeader(http.StatusOK)
+// 	w.Write([]byte(fmt.Sprintf(`{"run_id": %d}`, newRunID)))
+// }
