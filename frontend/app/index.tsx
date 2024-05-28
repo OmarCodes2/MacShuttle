@@ -29,7 +29,14 @@ export default function Home() {
 
   const startTracking = async () => {
     const retrieveID = `${process.env.EXPO_PUBLIC_API_URL}/retrieveRunID`;
-      await Tracking();
+    try {
+      const response = await axios.post(retrieveID);
+      console.log('Retrieved RunID:', response);
+    } catch (error) {
+      console.error('Error retrieving run ID:', error);
+      return;
+    }
+    await Tracking();
   }
   const Tracking = () => {
     setTracking(true);
