@@ -46,7 +46,7 @@ func runIDHandler(db *sql.DB) http.HandlerFunc {
 		runID = newRunID
 		log.Println("getting new run id correctly")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Able to successfully updated runID"))
+    	json.NewEncoder(w).Encode(map[string]int{"run_id": newRunID})
 	}
 }
 

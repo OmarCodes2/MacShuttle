@@ -9,6 +9,7 @@ export default function Home() {
   const [tracking, setTracking] = useState(false);
   const [direction, setDirection] = useState('forward');
   const [startTime, setStartTime] = useState<number | null>(null);
+  const [runID, setRunID] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -31,7 +32,8 @@ export default function Home() {
     const retrieveID = `${process.env.EXPO_PUBLIC_API_URL}/startTracking`;
     try {
       const response = await axios.post(retrieveID);
-      console.log('Retrieved RunID:', response);
+      console.log('Retrieved RunID:', response.data.run_id);
+      setRunID(response.data.run_id);
     } catch (error) {
       console.error('Error retrieving run ID:', error);
       return;
@@ -84,11 +86,18 @@ export default function Home() {
       {errorMsg ? (
         <Text style={styles.error}>{errorMsg}</Text>
       ) : (
-        location && (
-          <Text style={styles.text}>
-            Latitude: {location.coords.latitude}, Longitude: {location.coords.longitude}
-          </Text>
-        )
+        <>
+          {location && (
+            <Text style={styles.text}>
+              Latitude: {location.coords.latitude}, Longitude: {location.coords.longitude}
+            </Text>
+          )}
+          {runID !== null && (
+            <Text style={styles.text}>
+              Current Run ID: {runID}
+            </Text>
+          )}
+        </>
       )}
       <TouchableOpacity
         style={[styles.button, styles.startStopButton]}
