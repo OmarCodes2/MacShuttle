@@ -28,7 +28,7 @@ export default function Home() {
   }, []);
 
   const startTracking = async () => {
-    const retrieveID = `${process.env.EXPO_PUBLIC_API_URL}/retrieveRunID`;
+    const retrieveID = `${process.env.EXPO_PUBLIC_API_URL}/startTracking`;
     try {
       const response = await axios.post(retrieveID);
       console.log('Retrieved RunID:', response);
@@ -50,7 +50,7 @@ export default function Home() {
       const timestamp = Date.now() - initialTime; // Timestamp in milliseconds relative to start
 
       // Replace with your actual endpoint URL
-      const endpointUrl = `${process.env.EXPO_PUBLIC_API_URL}/location`;
+      const endpointUrl = `${process.env.EXPO_PUBLIC_API_URL}/liveTracking`;
       console.log(endpointUrl)
       console.log("latitude is")
       console.log(latitude)

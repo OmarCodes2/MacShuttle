@@ -10,3 +10,14 @@ func SaveLocation(db *sql.DB, locData models.LocationData, newRunID int) error {
 	_, err := db.Exec(query, newRunID, locData.Timestamp, locData.Longitude, locData.Latitude, locData.Direction)
 	return err
 }
+
+func GetNewRunID(db *sql.DB) (int, error) {
+	var latestRunID int
+	err := db.QueryRow(`SELECT COALESCE(MAX(run_id), 0) FROM bus_positions`).Scan(&latestRunID)
+	if err != nil {
+		return 0, err
+	}
+	newRunID := latestRunID + 1
+
+	return newRunID, nil
+}

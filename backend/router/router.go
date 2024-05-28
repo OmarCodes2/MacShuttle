@@ -20,8 +20,8 @@ var (
 func InitializeRouter(db *sql.DB) *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", helloHandler)
-	mux.HandleFunc("/retrieveRunID", GetNewRunID(db))
-	mux.HandleFunc("/location", locationHandler(db))
+	mux.HandleFunc("/startTracking", runIDHandler(db))
+	mux.HandleFunc("/liveTracking", locationHandler(db))
 	return mux
 }
 
@@ -30,20 +30,18 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello, World!"))
 }
 
-func GetNewRunID(db *sql.DB) http.HandlerFunc {
+func runIDHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 			return
 		}
-		var latestRunID int
-		err := db.QueryRow(`SELECT COALESCE(MAX(run_id), 0) FROM bus_positions`).Scan(&latestRunID)
+
+		newRunID, err := database.GetNewRunID(db)
 		if err != nil {
 			http.Error(w, "Error retrieving current run_id", http.StatusInternalServerError)
 			return
 		}
-
-		newRunID := latestRunID + 1
 		//Modifying Run ID Variable
 		runID = newRunID
 		log.Println("getting new run id correctly")
@@ -79,20 +77,3 @@ func locationHandler(db *sql.DB) http.HandlerFunc {
 		w.Write([]byte("Location received and database connection is successful"))
 	}
 }
-
-// func startRunHandler(w http.ResponseWriter, r *http.Request) {
-// 	mutex.Lock()
-// 	defer mutex.Unlock()
-
-// 	var currentRunID int
-// 	err := db.QueryRow("SELECT current_run_id FROM run_info LIMIT 1").Scan(&currentRunID)
-// 	if err != nil {
-// 		http.Error(w, "Error retrieving current run_id", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	newRunID := currentRunID + 1
-
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Write([]byte(fmt.Sprintf(`{"run_id": %d}`, newRunID)))
-// }
