@@ -9,6 +9,7 @@ export default function Home() {
   const [tracking, setTracking] = useState(false);
   const [direction, setDirection] = useState('forward');
   const [startTime, setStartTime] = useState<number | null>(null);
+  const [runID, setRunID] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -27,7 +28,19 @@ export default function Home() {
     };
   }, []);
 
-  const startTracking = () => {
+  const startTracking = async () => {
+    const retrieveID = `${process.env.EXPO_PUBLIC_API_URL}/startTracking`;
+    try {
+      const response = await axios.post(retrieveID);
+      console.log('Retrieved RunID:', response.data.run_id);
+      setRunID(response.data.run_id);
+    } catch (error) {
+      console.error('Error retrieving run ID:', error);
+      return;
+    }
+    await Tracking();
+  }
+  const Tracking = () => {
     setTracking(true);
     const initialTime = Date.now();
     setStartTime(initialTime);
@@ -39,7 +52,10 @@ export default function Home() {
       const timestamp = Date.now() - initialTime; // Timestamp in milliseconds relative to start
 
       // Replace with your actual endpoint URL
-      const endpointUrl = `${process.env.EXPO_PUBLIC_API_URL}/location`;
+      const endpointUrl = `${process.env.EXPO_PUBLIC_API_URL}/liveTracking`;
+      console.log(endpointUrl)
+      console.log("latitude is")
+      console.log(latitude)
       try {
         await axios.post(endpointUrl, {
           latitude,
@@ -70,11 +86,18 @@ export default function Home() {
       {errorMsg ? (
         <Text style={styles.error}>{errorMsg}</Text>
       ) : (
-        location && (
-          <Text style={styles.text}>
-            Latitude: {location.coords.latitude}, Longitude: {location.coords.longitude}
-          </Text>
-        )
+        <>
+          {location && (
+            <Text style={styles.text}>
+              Latitude: {location.coords.latitude}, Longitude: {location.coords.longitude}
+            </Text>
+          )}
+          {runID !== null && (
+            <Text style={styles.text}>
+              Current Run ID: {runID}
+            </Text>
+          )}
+        </>
       )}
       <TouchableOpacity
         style={[styles.button, styles.startStopButton]}
