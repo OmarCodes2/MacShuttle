@@ -46,7 +46,7 @@ func runIDHandler(db *sql.DB) http.HandlerFunc {
 		runID = newRunID
 		log.Println("getting new run id correctly")
 		w.WriteHeader(http.StatusOK)
-    	json.NewEncoder(w).Encode(map[string]int{"run_id": newRunID})
+		json.NewEncoder(w).Encode(map[string]int{"run_id": newRunID})
 	}
 }
 
@@ -66,6 +66,7 @@ func locationHandler(db *sql.DB) http.HandlerFunc {
 
 		log.Printf("Received location: %+v\n", locData)
 		log.Printf("RunID is %v", runID)
+		log.Printf("Direction is %v", locData.Direction)
 
 		if err := database.SaveLocation(db, locData, runID); err != nil {
 			log.Printf("Error saving location: %v\n", err)
