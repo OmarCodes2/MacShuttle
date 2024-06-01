@@ -49,9 +49,8 @@ export default function Home() {
       setLocation(currentLocation);
 
       const { latitude, longitude } = currentLocation.coords;
-      const timestamp = Date.now() - initialTime; // Timestamp in milliseconds relative to start
+      const timestamp = Date.now() - initialTime;
 
-      // Replace with your actual endpoint URL
       const endpointUrl = `${process.env.EXPO_PUBLIC_API_URL}/liveTracking`;
       console.log(endpointUrl)
       console.log("latitude is")
@@ -66,7 +65,7 @@ export default function Home() {
       } catch (error) {
         console.error('Error sending location data:', error);
       }
-    }, 5000); // 5000ms (5 seconds)
+    }, 500);
   };
 
   const stopTracking = () => {
