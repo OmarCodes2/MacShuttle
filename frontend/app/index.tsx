@@ -88,7 +88,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log('Direction toggled to:', direction);
   }, [direction]);
 
   return (
