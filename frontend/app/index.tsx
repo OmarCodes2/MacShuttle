@@ -11,6 +11,7 @@ export default function Home() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [runID, setRunID] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const directionRef = useRef(direction);  // Added this line
 
   useEffect(() => {
     (async () => {
@@ -40,7 +41,8 @@ export default function Home() {
     }
     await Tracking();
   }
-  const Tracking = () => {
+
+  const Tracking = () => {  // Changed from `const Tracking = async () => {` to `const Tracking = () => {`
     setTracking(true);
     const initialTime = Date.now();
     setStartTime(initialTime);
@@ -53,14 +55,15 @@ export default function Home() {
 
       const endpointUrl = `${process.env.EXPO_PUBLIC_API_URL}/liveTracking`;
       console.log(endpointUrl)
-      console.log("latitude is")
-      console.log(latitude)
+      console.log("latitude is", latitude)
+
       try {
+        console.log(directionRef.current)  // Changed from `direction` to `directionRef.current`
         await axios.post(endpointUrl, {
           latitude,
           longitude,
           timestamp,
-          direction,
+          direction: directionRef.current,  // Changed from `direction` to `directionRef.current`
         });
       } catch (error) {
         console.error('Error sending location data:', error);
@@ -77,9 +80,16 @@ export default function Home() {
   };
 
   const toggleDirection = () => {
-    setDirection((prevDirection) => (prevDirection === 'forward' ? 'reverse' : 'forward'));
-    console.log('Direction toggled to:', direction);
+    setDirection((prevDirection) => {
+      const newDirection = prevDirection === 'forward' ? 'reverse' : 'forward';
+      directionRef.current = newDirection;  // Added this line
+      return newDirection;
+    });
   };
+
+  useEffect(() => {
+    console.log('Direction toggled to:', direction);
+  }, [direction]);
 
   return (
     <View style={styles.container}>
