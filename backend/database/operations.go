@@ -2,6 +2,8 @@ package database
 
 import (
 	"database/sql"
+	"log"
+
 	"github.com/OmarCodes2/MacShuttle/models"
 )
 
@@ -34,5 +36,6 @@ func GetLatestBusLocation(db *sql.DB) (models.LocationData, error) {
     if err != nil {
         return location, err
     }
+	log.Println("DB query returned: ", location)
     return location, nil
 }

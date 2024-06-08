@@ -115,6 +115,7 @@ func GetClosestStop(lat, lon float64, direction string) (reference.StopInfo, err
 	if minDistance == math.MaxFloat64 {
 		return closestStop, errors.New("no stop found in GetClosestStop()")
 	}
+	log.Println("closest stop is: ", closestStop)
 	return closestStop, nil
 }
 
@@ -122,15 +123,15 @@ func CalculateETA(referenceCoords reference.StopInfo) ([]float64, error) {
 	const (
 		millisInMinute = 60000 // 60,000 milliseconds in a minute for conversion
 	)
-	var ETAStopA int
-	var ETAStopB int
+	var ETAStopA float64
+	var ETAStopB float64
 	// Calculating eta when bus is driving from A -> B
 	if referenceCoords.Direction == "forward" {
-		ETAStopB = reference.StopBtime - referenceCoords.TimeStamp
-		ETAStopA = ETAStopB + (reference.StopAtime - reference.StopBtime)
+		ETAStopB = float64(reference.StopBtime - referenceCoords.TimeStamp)
+		ETAStopA = float64(ETAStopB + (reference.StopAtime - reference.StopBtime))
 	} else { // Calculating eta when bus is driving from B -> A
-		ETAStopA = reference.StopAtime - referenceCoords.TimeStamp
-		ETAStopB = ETAStopA + reference.StopBtime
+		ETAStopA = float64(reference.StopAtime - referenceCoords.TimeStamp)
+		ETAStopB = float64(ETAStopA + reference.StopBtime)
 	}
 
 	// Converting to ETA in minutes
@@ -141,7 +142,8 @@ func CalculateETA(referenceCoords reference.StopInfo) ([]float64, error) {
 		return nil, errors.New("failed to calculate ETA in CalculateETA()")
 	}
 
-	ETAs := []float64{float64(ETAStopA), float64(ETAStopB), referenceCoords.Longitude, referenceCoords.Latitude}
+	ETAs := []float64{ETAStopA, ETAStopB, referenceCoords.Longitude, referenceCoords.Latitude}
+	log.Println("etas are: ", ETAs)
 	return ETAs, nil
 }
 
@@ -167,18 +169,17 @@ func GetBusETA(db *sql.DB) ([]float64, error) {
 	return ETAs, nil
 }
 
-func GetETAHandler(db *sql.DB) http.HandlerFunc {
-    return func(w http.ResponseWriter, r *http.Request) {
-        ETAs, err := GetBusETA(db)
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
+func getETAHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ETAs, err := GetBusETA(db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
 		log.Println("ETAs array corresponds to ETAStopA, ETAStopB, BusLongitude, BusLatitude: ")
 		log.Println(ETAs)
-        response := ETAs
-        json.NewEncoder(w).Encode(response)
-    }
+		response := ETAs
+		json.NewEncoder(w).Encode(response)
+	}
 }
-	
