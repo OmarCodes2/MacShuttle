@@ -21,3 +21,18 @@ func GetNewRunID(db *sql.DB) (int, error) {
 
 	return newRunID, nil
 }
+
+func GetLatestBusLocation(db *sql.DB) (models.LocationData, error) {
+    var location models.LocationData
+    query := `
+        SELECT timestamp_ms, ST_X(geom) as longitude, ST_Y(geom) as latitude, direction 
+        FROM bus_positions 
+        ORDER BY timestamp_ms DESC 
+        LIMIT 1`
+    
+    err := db.QueryRow(query).Scan(&location.Timestamp, &location.Longitude, &location.Latitude, &location.Direction)
+    if err != nil {
+        return location, err
+    }
+    return location, nil
+}
