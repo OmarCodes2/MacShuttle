@@ -8,7 +8,7 @@ type StopInfo struct {
 }
 
 const (
-	stopBtime = 251973
+	StopBtime = 251973
 	StopAtime = 457254 //in milliseconds
 )
 
