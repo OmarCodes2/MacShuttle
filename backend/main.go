@@ -28,10 +28,16 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	for {
-		// Dummy ETA data
-		dummyData := map[string]string{
-			"stop1": "ETA: 2 minutes",
-			"stop2": "ETA: 5 minutes",
+		// Dummy data including bus position
+		dummyData := map[string]interface{}{
+			"etas": map[string]string{
+				"stop1": "ETA: 2 minutes",
+				"stop2": "ETA: 5 minutes",
+			},
+			"busPosition": map[string]float64{
+				"latitude":  43.262670,
+				"longitude": -79.916121,
+			},
 		}
 
 		err = conn.WriteJSON(dummyData)
