@@ -25,6 +25,7 @@ func InitializeRouter(db *sql.DB) *http.ServeMux {
 	mux.HandleFunc("/", helloHandler)
 	mux.HandleFunc("/startTracking", runIDHandler(db))
 	mux.HandleFunc("/liveTracking", locationHandler(db))
+	mux.HandleFunc("/getETA", getETAHandler(db))
 	return mux
 }
 
@@ -117,7 +118,7 @@ func GetClosestStop(lat, lon float64, direction string) (reference.StopInfo, err
 	return closestStop, nil
 }
 
-func CalculateETA(referenceCoords reference.StopInfo) ([]int, error) {
+func CalculateETA(referenceCoords reference.StopInfo) ([]float64, error) {
 	const (
 		millisInMinute = 60000 // 60,000 milliseconds in a minute for conversion
 	)
@@ -136,10 +137,48 @@ func CalculateETA(referenceCoords reference.StopInfo) ([]int, error) {
 	ETAStopA = ETAStopA / millisInMinute
 	ETAStopB = ETAStopB / millisInMinute
 
-	if ETAStopA < 0 || ETAStopB < 0{
+	if ETAStopA < 0 || ETAStopB < 0 {
 		return nil, errors.New("failed to calculate ETA in CalculateETA()")
 	}
 
-	ETAs := []int{ETAStopA, ETAStopB}
-    return ETAs, nil
+	ETAs := []float64{float64(ETAStopA), float64(ETAStopB), referenceCoords.Longitude, referenceCoords.Latitude}
+	return ETAs, nil
 }
+
+func GetBusETA(db *sql.DB) ([]float64, error) {
+	//Retrieve most recent bus location from db
+	busLocation, err := database.GetLatestBusLocation(db)
+	if err != nil {
+		return nil, err
+	}
+
+	//Get closest reference stop to bus ETA
+	closestStop, err := GetClosestStop(busLocation.Latitude, busLocation.Longitude, busLocation.Direction)
+	if err != nil {
+		return nil, err
+	}
+
+	//Calculate ETA to each of the stops
+	ETAs, err := CalculateETA(closestStop)
+	if err != nil {
+		return nil, err
+	}
+
+	return ETAs, nil
+}
+
+func GetETAHandler(db *sql.DB) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        ETAs, err := GetBusETA(db)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+		log.Println("ETAs array corresponds to ETAStopA, ETAStopB, BusLongitude, BusLatitude: ")
+		log.Println(ETAs)
+        response := ETAs
+        json.NewEncoder(w).Encode(response)
+    }
+}
+	
