@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"time"
@@ -19,6 +21,26 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+func fetchETAData() ([]float64, error) {
+	resp, err := http.Get("http://localhost:5000/getETA")
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("error: status code %d", resp.StatusCode)
+	}
+
+	var data []float64
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -28,15 +50,31 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	for {
-		// Dummy data including bus position
+		// Fetch ETAs from the backend route
+		data, err := fetchETAData()
+		if err != nil {
+			log.Println("Error fetching ETA data:", err)
+			break
+		}
+
+		if len(data) != 4 {
+			log.Println("Unexpected data format")
+			break
+		}
+
+		// Round the first two elements to the nearest whole number
+		stop1ETA := math.Ceil(data[0])
+		stop2ETA := math.Ceil(data[1])
+
+		// Prepare the data to send through the WebSocket
 		dummyData := map[string]interface{}{
 			"etas": map[string]string{
-				"stop1": "ETA: 2 minutes",
-				"stop2": "ETA: 5 minutes",
+				"stop1": fmt.Sprintf("ETA: %.0f minutes", stop1ETA),
+				"stop2": fmt.Sprintf("ETA: %.0f minutes", stop2ETA),
 			},
 			"busPosition": map[string]float64{
-				"latitude":  43.262670,
-				"longitude": -79.916121,
+				"latitude":  data[3],
+				"longitude": data[2],
 			},
 		}
 
@@ -76,5 +114,5 @@ func main() {
 	r := router.InitializeRouter(db)
 	r.HandleFunc("/ws", wsHandler)
 	fmt.Println("Server is running on port 5000")
-	log.Fatal(http.ListenAndServe(":5000", r))	
+	log.Fatal(http.ListenAndServe(":5000", r))
 }
