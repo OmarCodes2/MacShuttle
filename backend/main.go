@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/http/httptest"
 	"os"
 
 	"github.com/OmarCodes2/MacShuttle/router"
