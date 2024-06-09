@@ -76,5 +76,5 @@ func main() {
 	r := router.InitializeRouter(db)
 	r.HandleFunc("/ws", wsHandler)
 	fmt.Println("Server is running on port 5000")
-	log.Fatal(http.ListenAndServe(":5000", r))
+	log.Fatal(http.ListenAndServe(":5000", r))	
 }

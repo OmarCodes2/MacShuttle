@@ -2,6 +2,8 @@ package database
 
 import (
 	"database/sql"
+	"log"
+
 	"github.com/OmarCodes2/MacShuttle/models"
 )
 
@@ -20,4 +22,20 @@ func GetNewRunID(db *sql.DB) (int, error) {
 	newRunID := latestRunID + 1
 
 	return newRunID, nil
+}
+
+func GetLatestBusLocation(db *sql.DB) (models.LocationData, error) {
+    var location models.LocationData
+    query := `
+        SELECT timestamp_ms, ST_X(geom) as longitude, ST_Y(geom) as latitude, direction 
+        FROM bus_positions 
+        ORDER BY timestamp_ms DESC 
+        LIMIT 1`
+    
+    err := db.QueryRow(query).Scan(&location.Timestamp, &location.Longitude, &location.Latitude, &location.Direction)
+    if err != nil {
+        return location, err
+    }
+	log.Println("DB query returned: ", location)
+    return location, nil
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/OmarCodes2/MacShuttle/database"
 	"github.com/OmarCodes2/MacShuttle/models"
+	"github.com/OmarCodes2/MacShuttle/services"
 	_ "github.com/lib/pq"
 )
 
@@ -22,6 +23,7 @@ func InitializeRouter(db *sql.DB) *http.ServeMux {
 	mux.HandleFunc("/", helloHandler)
 	mux.HandleFunc("/startTracking", runIDHandler(db))
 	mux.HandleFunc("/liveTracking", locationHandler(db))
+	mux.HandleFunc("/getETA", getETAHandler(db))
 	return mux
 }
 
@@ -76,5 +78,20 @@ func locationHandler(db *sql.DB) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Location received and database connection is successful"))
+	}
+}
+
+func getETAHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ETAs, err := services.GetBusETA(db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		log.Println("ETAs array corresponds to ETAStopA, ETAStopB, BusLongitude, BusLatitude: ")
+		log.Println(ETAs)
+		response := ETAs
+		json.NewEncoder(w).Encode(response)
 	}
 }
