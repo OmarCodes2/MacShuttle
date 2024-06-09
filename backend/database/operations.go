@@ -30,7 +30,10 @@ func GetLatestBusLocation(db *sql.DB) (models.LocationData, error) {
 	SELECT timestamp_ms, ST_X(geom) as longitude, ST_Y(geom) as latitude, direction 
 	FROM bus_positions 
 	WHERE run_id = (
-		SELECT COALESCE(MAX(run_id), 0) FROM bus_positions
+		SELECT run_id 
+		FROM bus_positions 
+		ORDER BY timestamp_ms DESC 
+		LIMIT 1
 	)
 	ORDER BY timestamp_ms DESC 
 	LIMIT 1`
