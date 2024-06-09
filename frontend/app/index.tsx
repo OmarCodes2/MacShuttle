@@ -68,7 +68,7 @@ export default function Home() {
       } catch (error) {
         console.error('Error sending location data:', error);
       }
-    }, 500);
+    }, 2000);
   };
 
   const stopTracking = () => {
