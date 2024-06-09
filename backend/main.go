@@ -37,19 +37,5 @@ func main() {
 
 	r := router.InitializeRouter(db)
 	fmt.Println("Server is running on port 5000")
-
-	req, err := http.NewRequest("GET", "/getETA", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	rr := httptest.NewRecorder()
-    r.ServeHTTP(rr, req)
-
-	if status := rr.Code; status != http.StatusOK {
-        log.Fatal("handler returned wrong status code: got %v want %v", status, http.StatusOK)
-    }
-
-	fmt.Println("Response of eta handler:", rr.Body.String())
-
 	log.Fatal(http.ListenAndServe(":5000", r))	
 }
