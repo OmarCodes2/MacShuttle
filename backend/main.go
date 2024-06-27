@@ -10,6 +10,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/OmarCodes2/MacShuttle/database"
+	"github.com/OmarCodes2/MacShuttle/reference"
 	"github.com/OmarCodes2/MacShuttle/router"
 	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
@@ -89,6 +91,18 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func insertBusPositions(db *sql.DB, runID int) {
+	for _, stop := range reference.ReferenceMap {
+		log.Printf("running bus position simulator")
+		err := database.SaveLocation1(db, stop.Longitude, stop.Latitude, stop.Direction, stop.TimeStamp, runID)
+		if err != nil {
+			log.Fatalf("Error inserting stop info: %v", err)
+		}
+		log.Printf("Inserted stop info: %+v", stop)
+		time.Sleep(2 * time.Second) // Sleep for 2 seconds
+	}
+}
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -110,6 +124,9 @@ func main() {
 	}
 
 	fmt.Println("Successfully connected to the PostgreSQL database")
+	//bus poition similator
+	log.Println("bus simulation")
+	insertBusPositions(db, 23)
 
 	r := router.InitializeRouter(db)
 	r.HandleFunc("/ws", wsHandler)

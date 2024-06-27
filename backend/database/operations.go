@@ -42,3 +42,9 @@ func GetLatestBusLocation(db *sql.DB) (models.LocationData, error) {
 	log.Println("DB query returned: ", location)
     return location, nil
 }
+
+func SaveLocation1(db *sql.DB,longitude float64, latitude float64, direction string, timestamp int , newRunID int) error {
+	query := `INSERT INTO bus_positions (run_id, timestamp_ms, geom, direction) VALUES ($1, $2, ST_SetSRID(ST_MakePoint($3, $4), 4326), $5)`
+	_, err := db.Exec(query, newRunID, timestamp, longitude, latitude, direction)
+	return err
+}
