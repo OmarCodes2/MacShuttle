@@ -24,12 +24,13 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     color: colors.white,
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: 'Montserrat-Medium',
   },
   subtitle: {
     fontSize: 12,
     color: colors.white,
+    fontFamily: 'Montserrat-Regular',
   },
 })

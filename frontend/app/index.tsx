@@ -6,6 +6,7 @@ import Map from '@/components/map/map'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import BottomSheetWrapper from '@/components/bottom-sheet/bottomSheetWrapper'
 import BottomSheetTitle from '@/components/bottom-sheet/bottomSheetTitle'
+import BottomSheetBlock from '@/components/bottom-sheet/bottomSheetBlock'
 
 export default function Home() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
@@ -94,13 +95,27 @@ export default function Home() {
   useEffect(() => {}, [direction])
 
   return (
-    // GestureHandlerRootView is required for scrollable bottom sheet
+    // `GestureHandlerRootView` is required for scrollable bottom sheet
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Map />
       <BottomSheetWrapper>
-        <BottomSheetTitle title='Example Title' subtitle='Some description' />
+        <BottomSheetTitle
+          title='Example Nearest Stop'
+          subtitle='Upcoming shuttles'
+        />
+        <BottomSheetBlock
+          leftText='Example Shuttle'
+          rightText='1 min'
+          clickable={true}
+        />
+        <BottomSheetBlock
+          leftText='Example Shuttle'
+          rightText='7 min'
+          clickable={true}
+        />
       </BottomSheetWrapper>
     </GestureHandlerRootView>
+
     // <View style={styles.container}>
     //   {errorMsg ? (
     //     <Text style={styles.error}>{errorMsg}</Text>
