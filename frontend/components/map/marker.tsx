@@ -8,12 +8,8 @@ interface MapMarkerProps {
 
 const MapMarker = ({ latitude, longitude }: MapMarkerProps) => {
   return (
-    <Marker
-      coordinate={{ latitude, longitude }}
-      title='My Marker'
-      description='This is a description of the marker'
-    >
-      <MarkerDefaultIcon width={30} height={30} />
+    <Marker coordinate={{ latitude, longitude }}>
+      <MarkerDefaultIcon width={35} height={35} />
     </Marker>
   )
 }
