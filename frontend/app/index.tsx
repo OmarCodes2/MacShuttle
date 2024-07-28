@@ -1,61 +1,62 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
-import * as Location from 'expo-location';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from 'react'
+import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
+import * as Location from 'expo-location'
+import axios from 'axios'
+import Map from '@/components/map/map'
 
 export default function Home() {
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [tracking, setTracking] = useState(false);
-  const [direction, setDirection] = useState('forward');
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [runID, setRunID] = useState<number | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const directionRef = useRef(direction);
+  const [location, setLocation] = useState<Location.LocationObject | null>(null)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [tracking, setTracking] = useState(false)
+  const [direction, setDirection] = useState('forward')
+  const [startTime, setStartTime] = useState<number | null>(null)
+  const [runID, setRunID] = useState<number | null>(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const directionRef = useRef(direction)
 
   useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+    ;(async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync()
       if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
+        setErrorMsg('Permission to access location was denied')
+        return
       }
-    })();
+    })()
 
     return () => {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+        clearInterval(intervalRef.current)
       }
-    };
-  }, []);
+    }
+  }, [])
 
   const startTracking = async () => {
-    const retrieveID = `${process.env.EXPO_PUBLIC_API_URL}/startTracking`;
+    const retrieveID = `${process.env.EXPO_PUBLIC_API_URL}/startTracking`
     try {
-      const response = await axios.post(retrieveID);
-      console.log('Retrieved RunID:', response.data.run_id);
-      setRunID(response.data.run_id);
+      const response = await axios.post(retrieveID)
+      console.log('Retrieved RunID:', response.data.run_id)
+      setRunID(response.data.run_id)
     } catch (error) {
-      console.error('Error retrieving run ID:', error);
-      return;
+      console.error('Error retrieving run ID:', error)
+      return
     }
-    await Tracking();
+    await Tracking()
   }
 
   const Tracking = () => {
-    setTracking(true);
-    const initialTime = Date.now();
-    setStartTime(initialTime);
+    setTracking(true)
+    const initialTime = Date.now()
+    setStartTime(initialTime)
     intervalRef.current = setInterval(async () => {
-      let currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
+      let currentLocation = await Location.getCurrentPositionAsync({})
+      setLocation(currentLocation)
 
-      const { latitude, longitude } = currentLocation.coords;
-      const timestamp = Date.now() - initialTime;
+      const { latitude, longitude } = currentLocation.coords
+      const timestamp = Date.now() - initialTime
 
-      const endpointUrl = `${process.env.EXPO_PUBLIC_API_URL}/liveTracking`;
+      const endpointUrl = `${process.env.EXPO_PUBLIC_API_URL}/liveTracking`
       console.log(endpointUrl)
-      console.log("latitude is", latitude)
+      console.log('latitude is', latitude)
 
       try {
         console.log(directionRef.current)
@@ -64,61 +65,61 @@ export default function Home() {
           longitude,
           timestamp,
           direction: directionRef.current,
-        });
+        })
       } catch (error) {
-        console.error('Error sending location data:', error);
+        console.error('Error sending location data:', error)
       }
-    }, 500);
-  };
+    }, 500)
+  }
 
   const stopTracking = () => {
-    setTracking(false);
+    setTracking(false)
     if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
     }
-  };
+  }
 
   const toggleDirection = () => {
     setDirection((prevDirection) => {
-      const newDirection = prevDirection === 'forward' ? 'reverse' : 'forward';
-      directionRef.current = newDirection;
-      return newDirection;
-    });
-  };
+      const newDirection = prevDirection === 'forward' ? 'reverse' : 'forward'
+      directionRef.current = newDirection
+      return newDirection
+    })
+  }
 
-  useEffect(() => {
-  }, [direction]);
+  useEffect(() => {}, [direction])
 
   return (
-    <View style={styles.container}>
-      {errorMsg ? (
-        <Text style={styles.error}>{errorMsg}</Text>
-      ) : (
-        <>
-          {location && (
-            <Text style={styles.text}>
-              Latitude: {location.coords.latitude}, Longitude: {location.coords.longitude}
-            </Text>
-          )}
-          {runID !== null && (
-            <Text style={styles.text}>
-              Current Run ID: {runID}
-            </Text>
-          )}
-        </>
-      )}
-      <TouchableOpacity
-        style={[styles.button, styles.startStopButton]}
-        onPress={tracking ? stopTracking : startTracking}
-      >
-        <Text style={styles.buttonText}>{tracking ? 'Stop' : 'Start'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={toggleDirection}>
-        <Text style={styles.buttonText}>Toggle Direction (Current: {direction})</Text>
-      </TouchableOpacity>
-    </View>
-  );
+    <Map />
+    // <View style={styles.container}>
+    //   {errorMsg ? (
+    //     <Text style={styles.error}>{errorMsg}</Text>
+    //   ) : (
+    //     <>
+    //       {location && (
+    //         <Text style={styles.text}>
+    //           Latitude: {location.coords.latitude}, Longitude: {location.coords.longitude}
+    //         </Text>
+    //       )}
+    //       {runID !== null && (
+    //         <Text style={styles.text}>
+    //           Current Run ID: {runID}
+    //         </Text>
+    //       )}
+    //     </>
+    //   )}
+    //   <TouchableOpacity
+    //     style={[styles.button, styles.startStopButton]}
+    //     onPress={tracking ? stopTracking : startTracking}
+    //   >
+    //     <Text style={styles.buttonText}>{tracking ? 'Stop' : 'Start'}</Text>
+    //   </TouchableOpacity>
+    //   <TouchableOpacity style={styles.button} onPress={toggleDirection}>
+    //     <Text style={styles.buttonText}>Toggle Direction (Current: {direction})</Text>
+    //   </TouchableOpacity>
+    // </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -153,4 +154,4 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
-});
+})
