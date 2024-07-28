@@ -12,7 +12,7 @@ const BottomSheetWrapper: React.FC<{ children: React.ReactNode }> = ({
     <BottomSheet
       ref={bottomSheetRef}
       index={0}
-      snapPoints={['25%', '50%', '75%']}
+      snapPoints={['33%', '75%']}
       backgroundStyle={styles.background}
     >
       <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>

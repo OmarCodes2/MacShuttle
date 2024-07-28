@@ -57,7 +57,6 @@ const styles = StyleSheet.create({
   icon: {
     marginLeft: 8,
     color: colors.white,
-    fontFamily: 'Montserrat-Regular',
   },
 })
 

@@ -10,18 +10,18 @@ interface ButtonProps {
 
 const boardShuttleButton = ({ status, onPress }: ButtonProps) => {
   const buttonColor = useMemo(
-    () => (status === 'exit' ? colors.green : colors.red),
+    () => (status === 'board' ? colors.green : colors.red),
     [status],
   )
 
   const buttonText = useMemo(
-    () => (status === 'exit' ? 'Board' : 'Disembark'),
+    () => (status === 'board' ? 'Board' : 'Disembark'),
     [status],
   )
 
   return (
     <TouchableOpacity
-      style={{ backgroundColor: buttonColor }}
+      style={[styles.button, { backgroundColor: buttonColor }]}
       onPress={onPress}
     >
       <Text style={styles.text}>{buttonText}</Text>

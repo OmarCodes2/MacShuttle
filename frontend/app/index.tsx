@@ -7,6 +7,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import BottomSheetWrapper from '@/components/bottom-sheet/bottomSheetWrapper'
 import BottomSheetTitle from '@/components/bottom-sheet/bottomSheetTitle'
 import BottomSheetBlock from '@/components/bottom-sheet/bottomSheetBlock'
+import MyShuttleButton from '@/components/buttons/myShuttleButton'
+import BoardShuttleButton from '@/components/buttons/boardShuttleButton'
 
 export default function Home() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
