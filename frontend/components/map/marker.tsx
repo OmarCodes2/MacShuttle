@@ -23,11 +23,8 @@ const MapMarker = ({ latitude, longitude, type }: MapMarkerProps) => {
         return <MarkerDefaultIcon width={35} height={35} />
     }
   }, [type])
-  return (
-    <Marker coordinate={{ latitude, longitude }}>
-      <MarkerDefaultIcon width={35} height={35} />
-    </Marker>
-  )
+
+  return <Marker coordinate={{ latitude, longitude }}>{markerIcon}</Marker>
 }
 
 export default MapMarker
