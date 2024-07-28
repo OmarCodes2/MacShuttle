@@ -5,6 +5,8 @@ import {
   getCurrentPositionAsync,
   requestForegroundPermissionsAsync,
 } from 'expo-location'
+import MapMarker from './marker'
+import { busStops } from '@/constants/map/locations'
 
 const DEFAULT_DELTA = 0.005
 
@@ -42,7 +44,20 @@ const Map = () => {
   return (
     <View style={styles.container}>
       {region ? (
-        <MapView style={styles.map} region={region} showsUserLocation />
+        <MapView
+          style={styles.map}
+          region={region}
+          minZoomLevel={12}
+          showsUserLocation
+        >
+          {busStops.map((busStop) => (
+            <MapMarker
+              key={busStop.stop}
+              latitude={busStop.latitude}
+              longitude={busStop.longitude}
+            />
+          ))}
+        </MapView>
       ) : (
         <ActivityIndicator size='large' />
       )}
