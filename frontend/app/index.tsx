@@ -3,8 +3,9 @@ import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
 import * as Location from 'expo-location'
 import axios from 'axios'
 import Map from '@/components/map/map'
-import BottomSheetBox from '@/components/bottom-sheet/bottomSheetBox'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import BottomSheetWrapper from '@/components/bottom-sheet/bottomSheetWrapper'
+import BottomSheetTitle from '@/components/bottom-sheet/bottomSheetTitle'
 
 export default function Home() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
@@ -93,12 +94,12 @@ export default function Home() {
   useEffect(() => {}, [direction])
 
   return (
-    // GestureHandlerRootView required for scrollable bottom sheet
+    // GestureHandlerRootView is required for scrollable bottom sheet
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Map />
-      <BottomSheetBox>
-        <Text>hello</Text>
-      </BottomSheetBox>
+      <BottomSheetWrapper>
+        <BottomSheetTitle title='Example Title' subtitle='Some description' />
+      </BottomSheetWrapper>
     </GestureHandlerRootView>
     // <View style={styles.container}>
     //   {errorMsg ? (

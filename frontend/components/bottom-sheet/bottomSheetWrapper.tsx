@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native'
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { colors } from '@/constants/styles/colors'
 
-const BottomSheetBox: React.FC<{ children: React.ReactNode }> = ({
+const BottomSheetWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null)
@@ -22,7 +22,7 @@ const BottomSheetBox: React.FC<{ children: React.ReactNode }> = ({
   )
 }
 
-export default BottomSheetBox
+export default BottomSheetWrapper
 
 const styles = StyleSheet.create({
   background: {
